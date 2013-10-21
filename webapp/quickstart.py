@@ -29,6 +29,11 @@ def nonempty(x):
         raise ValidationError("Please enter some text.")
     return x
 
+def boolean(x):
+    if x.upper() not in ('Y', 'YES', 'N', 'NO'):
+        raise ValidationError("Please enter either 'y' or 'n'.")
+    return x.upper() in ('Y', 'YES')
+
 
 def do_prompt(d, key, text, default=None, validator=nonempty):
     while True:
@@ -59,6 +64,15 @@ def ask_user(d):
     else:
         print('Enter the root path for webapp.')
         do_prompt(d, 'path', 'Root path for the webapp', '.', is_path)
+
+    if 'open_iap' not in d:
+        print('Open In-App Purchases (Y/N).')
+        do_prompt(d, 'open_iap', 'Open In-App Purchases', 'N', boolean)
+    pass
+
+    if 'push_notification' not in d:
+        print('Open push notification (Y/N).')
+        do_prompt(d, 'open_iap', 'Open push notification', 'N', boolean)
     pass
 
 def generate(d, overwrite=True, silent=False):
