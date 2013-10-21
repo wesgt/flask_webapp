@@ -1,6 +1,8 @@
-import sys, os
+import sys
+import os
+import shutil
 from os import path
-from webapp import __version__
+from flask_webapp import __version__
 
 PROMPT_PREFIX = '> '
 
@@ -8,10 +10,12 @@ if sys.version_info < (3, 3, 2):
     print('Error, need python version : 3.3.2')
     sys.exit(1)
 
+
 def mkdir_p(dir):
     if path.isdir(dir):
         return
     os.makedirs(dir)
+
 
 class ValidationError(Exception):
 
@@ -28,6 +32,7 @@ def nonempty(x):
     if not x:
         raise ValidationError("Please enter some text.")
     return x
+
 
 def boolean(x):
     if x.upper() not in ('Y', 'YES', 'N', 'NO'):
@@ -75,6 +80,7 @@ def ask_user(d):
         do_prompt(d, 'open_iap', 'Open push notification', 'N', boolean)
     pass
 
+
 def generate(d, overwrite=True, silent=False):
 
     webapp_root_path = d['path'].lower()
@@ -96,14 +102,30 @@ def generate(d, overwrite=True, silent=False):
         else:
             print('File {0} already exists, skipping.'.format(fpath))
 
+    here = path.dirname(path.abspath(__file__))
+    shutil.copyfile(path.join(here, 'webapp_test_all.py'),
+                    path.join(webapp_root_path, 'webapp_test_all.py'))
+
+    shutil.copyfile(path.join(here, 'webapp_main.py'),
+                    path.join(webapp_root_path, 'webapp_main.py'))
+
+    shutil.copyfile(path.join(here, 'webapp/__init__.py'),
+                    path.join(webapp_root_path, 'webapp/__init__.py'))
+
+    config_content = 'DEBUG = True\n' + "SERVER_IP = '172.18.102.104'\n" + \
+        'SERVER_PORT = 80\n' + "LOG_PATH = 'log/webapp.log'\n" + \
+        "SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT1346'\n"
+
+    write_file(
+        path.join(webapp_root_path, 'webapp/config.cfg'), config_content)
 
     print()
     print('Finished: An new webapp has been created.')
     pass
 
+
 def main(argv=sys.argv):
     d = {}
-    print('len(argv) : {0}'.format(len(argv)))
 
     if len(argv) > 3:
         print('Usage: webapp-quickstart [root]')
@@ -111,7 +133,6 @@ def main(argv=sys.argv):
     elif len(argv) == 2:
         d['path'] = argv[1]
     try:
-        print('d : {0}'.format(d))
         ask_user(d)
     except (KeyboardInterrupt, EOFError):
         print()
