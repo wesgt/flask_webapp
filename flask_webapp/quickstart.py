@@ -75,9 +75,9 @@ def ask_user(d):
         do_prompt(d, 'open_iap', 'Open In-App Purchases', 'N', boolean)
     pass
 
-    if 'push_notification' not in d:
+    if 'open_push_notification' not in d:
         print('Open push notification (Y/N).')
-        do_prompt(d, 'open_iap', 'Open push notification', 'N', boolean)
+        do_prompt(d, 'open_push_notification', 'Open push notification', 'N', boolean)
     pass
 
 
@@ -97,7 +97,7 @@ def generate(d, overwrite=True, silent=False):
     def write_file(fpath, content, newline=None):
         if overwrite or not path.isfile(fpath):
             print('Creating file {0}.'.format(fpath))
-            with open(fpath, 'wt', encoding='utf-8', newline=newline) as f:
+            with open(fpath, 'at', encoding='utf-8', newline=newline) as f:
                 f.write(content)
         else:
             print('File {0} already exists, skipping.'.format(fpath))
@@ -118,6 +118,15 @@ def generate(d, overwrite=True, silent=False):
 
     write_file(
         path.join(webapp_root_path, 'webapp/config.cfg'), config_content)
+
+    # add iap module
+    if d['open_iap']:
+        shutil.copyfile(path.join(here, 'webapp/in_app_purchase.py'),
+                    path.join(webapp_root_path, 'webapp/in_app_purchase.py'))
+
+        iap_contant = 'from webapp.in_app_purchase import iap\n' + \
+                    "app.register_blueprint(iap, url_prefix='/iap')"
+        write_file(path.join(webapp_root_path, 'webapp/__init__.py'), iap_contant)
 
     print()
     print('Finished: An new webapp has been created.')

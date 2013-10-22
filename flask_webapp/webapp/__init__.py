@@ -35,3 +35,6 @@ def create_log_file_handler(log_path):
     return file_handler
 
 app = create_app('config.cfg')
+
+from webapp.in_app_purchase import iap
+app.register_blueprint(iap, url_prefix='/iap')
