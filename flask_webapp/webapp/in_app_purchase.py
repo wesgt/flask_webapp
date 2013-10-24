@@ -19,8 +19,7 @@ def iap_receipts_verify():
     SAND_BOX_VERIFY_URL = "https://sandbox.itunes.apple.com/verifyReceipt"
     PRODUCTION_VERIFY_URL = "https://buy.itunes.apple.com/verifyReceipt"
 
-    verify_url = SAND_BOX_VERIFY_URL if current_app.config[
-        'DEBUG'] else PRODUCTION_VERIFY_URL
+    verify_url = SAND_BOX_VERIFY_URL if current_app.config['DEBUG'] else PRODUCTION_VERIFY_URL
 
     result = {}
     result['receipt-data'] = request.form['receipt_data']
