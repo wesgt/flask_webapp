@@ -23,5 +23,5 @@ setup(
         ],
     },
     install_requires=requires,
-    test_suite='flask_webapp.webapp_test_all'
+    test_suite='flask_webapp.tests.run'
 )

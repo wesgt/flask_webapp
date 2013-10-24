@@ -8,13 +8,15 @@ from flask import Flask
 def create_app(config_filename):
     app = Flask(__name__)
     app.config.from_pyfile(config_filename, silent=True)
-    app.logger.addHandler(create_log_file_handler(app.config.get('LOG_PATH')))
+
+    if not app.config['DEBUG']:
+        app.logger.addHandler(create_log_file_handler(app.config.get('LOG_PATH')))
 
     return app
 
 
 def create_log_file_handler(log_path):
-    last_slash_index = str.rfind(log_path,'/')
+    last_slash_index = str.rfind(log_path, '/')
     log_folder = log_path[: last_slash_index]
     log_filename = log_path[last_slash_index + 1:]
     now_date = datetime.date.today()
@@ -35,6 +37,3 @@ def create_log_file_handler(log_path):
     return file_handler
 
 app = create_app('config.cfg')
-
-from webapp.in_app_purchase import iap
-app.register_blueprint(iap, url_prefix='/iap')
