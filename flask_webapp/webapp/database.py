@@ -8,7 +8,6 @@ db_session = None
 Base = None
 
 def init_db(database_uri):
-    print('database_uri : {0}'.format(database_uri))
     global engine, db_session, Base
     engine = create_engine(database_uri, convert_unicode=True)
     db_session = scoped_session(sessionmaker(autocommit=False,

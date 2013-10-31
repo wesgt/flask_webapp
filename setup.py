@@ -7,7 +7,7 @@ except ImportError:
 
 import sys
 
-requires = ['Flask>=0.10']
+requires = ['Flask>=0.10', 'SQLAlchemy>=0.8.2', 'pymysql3']
 
 if sys.version_info < (3, 3):
     print('ERROR: Flask_Webapp requires at least Python 3.3 to run.')
@@ -17,11 +17,14 @@ setup(
     name="Flask_Webapp",
     version="0.1",
     packages=find_packages(),
+    package_data = {
+        'flask_webapp.webapp': ['*.cfg'],
+    },
     entry_points={
         'console_scripts': [
             'flask_webapp-quickstart = flask_webapp.quickstart:main',
         ],
     },
     install_requires=requires,
-    test_suite='flask_webapp.tests.run'
+    #test_suite='flask_webapp.tests.run'
 )

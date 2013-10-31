@@ -111,7 +111,11 @@ def generate(d, overwrite=True, silent=False):
 
     copy_file('webapp_main.py')
     copy_file('webapp/__init__.py')
-    copy_file('webapp/config.cfg')
+    copy_file('webapp/extensions.py')
+    copy_file('webapp/database.py')
+    copy_file('webapp/models.py')
+    copy_file('webapp/config_production.cfg')
+    copy_file('webapp/config_testing.cfg')
     copy_file('tests/__init__.py')
     copy_file('tests/run.py')
 
@@ -122,7 +126,7 @@ def generate(d, overwrite=True, silent=False):
 
         iap_blueprint_contant = 'from webapp.in_app_purchase import iap\n' + \
                                 "app.register_blueprint(iap, url_prefix='/iap')\n"
-        write_file(path.join(webapp_root_path, 'webapp/__init__.py'), iap_blueprint_contant)
+        write_file(path.join(webapp_root_path, 'webapp/extensions.py'), iap_blueprint_contant)
 
         copy_file('tests/test_in_app_purchase.py')
 
@@ -132,7 +136,7 @@ def generate(d, overwrite=True, silent=False):
 
         push_blueprint_contant = 'from webapp.push_notification import push_notification\n' + \
                     "app.register_blueprint(push_notification, url_prefix='/push_notification')\n"
-        write_file(path.join(webapp_root_path, 'webapp/__init__.py'), push_blueprint_contant)
+        write_file(path.join(webapp_root_path, 'webapp/extensions.py'), push_blueprint_contant)
 
         copy_file('tests/test_push_notification.py')
 
