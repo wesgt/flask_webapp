@@ -111,15 +111,10 @@ def generate(d, overwrite=True, silent=False):
 
     copy_file('webapp_main.py')
     copy_file('webapp/__init__.py')
+    copy_file('webapp/config.cfg')
     copy_file('tests/__init__.py')
     copy_file('tests/run.py')
 
-    config_content = 'DEBUG = True\n' + "SERVER_IP = '172.18.102.104'\n" + \
-        'SERVER_PORT = 80\n' + "LOG_PATH = 'log/webapp.log'\n" + \
-        "SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT1346'\n"
-
-    write_file(
-        path.join(webapp_root_path, 'webapp/config.cfg'), config_content)
 
     # add iap module
     if d['open_iap']:

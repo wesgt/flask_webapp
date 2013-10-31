@@ -10,13 +10,16 @@ class ResultType:
 
 @push_notification.route('/users/<user_id>/devices', methods=['PUT', 'DELETE'])
 def register_devices_token(user_id=None):
-    '''
-        註冊 / 刪除 裝置的 token, 而後可依據 token 來將訊息推播到各裝置
-    '''
+    """
+
+        (register / delete) device token,
+        and then sand message to device by this token.
+
+    """
 
     if request.method == 'PUT':
 
-        if request.form['token'] == '':
+        if not request.form['token']:
             return jsonify(result=ResultType.REGISTER_DIVICES_EMPTY_TOKEN_ERROR)
 
         return jsonify(result=ResultType.REGISTER_DIVICES_TOKEN_SUCCESS)

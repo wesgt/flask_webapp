@@ -3,14 +3,15 @@ import datetime
 import logging
 from logging import FileHandler, Formatter
 from flask import Flask
+from webapp.database import init_db
 
 
 def create_app(config_filename):
     app = Flask(__name__)
     app.config.from_pyfile(config_filename, silent=True)
 
-    if not app.config['DEBUG']:
-        app.logger.addHandler(create_log_file_handler(app.config.get('LOG_PATH')))
+    # app.logger.addHandler(create_log_file_handler(app.config.get('LOG_PATH')))
+    init_db(app.config['SQLALCHEMY_DATABASE_URI'])
 
     return app
 
@@ -35,5 +36,3 @@ def create_log_file_handler(log_path):
     ))
 
     return file_handler
-
-app = create_app('config.cfg')

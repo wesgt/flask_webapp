@@ -12,9 +12,11 @@ class ResultType:
 
 @iap.route('/receipts/verify', methods=['POST', 'GET'])
 def iap_receipts_verify():
-    '''
+    """
+
         Validating Receipts With the App Store
-    '''
+
+    """
 
     SAND_BOX_VERIFY_URL = "https://sandbox.itunes.apple.com/verifyReceipt"
     PRODUCTION_VERIFY_URL = "https://buy.itunes.apple.com/verifyReceipt"
