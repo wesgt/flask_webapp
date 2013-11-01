@@ -7,6 +7,7 @@ engine = None
 db_session = None
 Base = None
 
+
 def init_db(database_uri):
     global engine, db_session, Base
     engine = create_engine(database_uri, convert_unicode=True)
@@ -16,11 +17,19 @@ def init_db(database_uri):
     Base = declarative_base()
     Base.query = db_session.query_property()
 
-    import webapp.models
-    create_all_table()
 
 def create_all_table():
+    import webapp.models
     Base.metadata.create_all(bind=engine)
+
+
+def create_all_test_table():
+    import webapp.models
+    import imp
+    imp.reload(webapp.models)
+
+    create_all_table()
+
 
 def drop_all_table():
     Base.metadata.drop_all(bind=engine)

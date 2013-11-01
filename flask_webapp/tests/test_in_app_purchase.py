@@ -2,6 +2,7 @@ import unittest
 from flask import json
 import webapp
 from webapp.in_app_purchase import ResultType, iap
+from webapp.database import db_session, drop_all_table
 
 
 class IAPTestCase(unittest.TestCase):
@@ -11,10 +12,12 @@ class IAPTestCase(unittest.TestCase):
         app.config['TESTING'] = True
         app.register_blueprint(iap, url_prefix='/iap')
         self.client = app.test_client()
-        pass
 
     def tearDown(self):
-        pass
+        if db_session:
+            db_session.remove()
+
+        drop_all_table()
 
     def setUpClass():
         pass

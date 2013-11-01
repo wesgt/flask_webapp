@@ -1,8 +1,8 @@
 import unittest
 from flask import json
 import webapp
-from webapp.push_notification import push_notification, ResultType
-from webapp.database import db_session, init_db, drop_all_table
+from webapp.push_notification import notify, ResultType
+from webapp.database import db_session, drop_all_table
 
 
 class PushNotificationTestCase(unittest.TestCase):
@@ -10,14 +10,14 @@ class PushNotificationTestCase(unittest.TestCase):
     def setUp(self):
         app = webapp.create_app('config_testing.cfg')
         app.config['TESTING'] = True
-        app.register_blueprint(push_notification, url_prefix='/push_notification')
+        app.register_blueprint(notify, url_prefix='/notify')
         self.client = app.test_client()
 
     def tearDown(self):
         if db_session:
             db_session.remove()
 
-        drop_all_table()
+        #drop_all_table()
 
     def setUpClass():
         pass
@@ -30,8 +30,8 @@ class PushNotificationTestCase(unittest.TestCase):
         user_id = '1'
         token = 'test_token'
         register_rv = self.client.put(
-            '/push_notification/users/' + user_id + '/devices',
-            data=dict(token=token),
+            '/notify/users/' + user_id + '/devices',
+            data=dict(token=token, game_id='test_game'),
             follow_redirects=False)
 
         register_result = json.loads(str(register_rv.data, 'utf-8'))
@@ -42,8 +42,8 @@ class PushNotificationTestCase(unittest.TestCase):
         user_id = '1'
         token = ''
         register_rv = self.client.put(
-            '/push_notification/users/' + user_id + '/devices',
-            data=dict(token=token),
+            '/notify/users/' + user_id + '/devices',
+            data=dict(token=token, game_id='test_game'),
             follow_redirects=False)
 
         register_result = json.loads(str(register_rv.data, 'utf-8'))
