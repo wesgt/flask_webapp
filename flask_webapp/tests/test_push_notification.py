@@ -17,7 +17,7 @@ class PushNotificationTestCase(unittest.TestCase):
         if db_session:
             db_session.remove()
 
-        #drop_all_table()
+        drop_all_table()
 
     def setUpClass():
         pass
