@@ -50,5 +50,17 @@ class PushNotificationTestCase(unittest.TestCase):
         self.assertEqual(ResultType.REGISTER_DIVICES_EMPTY_TOKEN_ERROR,
                          register_result['result'])
 
-    def test_push_notification_return_correct(self):
+    def test_simple_notification_return_correct(self):
+        message = 'Oh no! Server\'s Down!'
+
+        push_notification_rv = self.client.post(
+            '/notify/message',
+            data=dict(message=message),
+            follow_redirects=False)
+
+        push_notification_result = json.loads(str(push_notification_rv.data,
+                                              'utf-8'))
+
+        self.assertEqual(ResultType.PUSH_NOTIFICATION_SUCCESS,
+                         push_notification_result['result'])
         pass
