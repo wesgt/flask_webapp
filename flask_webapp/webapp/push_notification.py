@@ -54,6 +54,7 @@ def push_notification_message(notification_type=None):
     """
 
     Push message to APNs, and then APNs send message to device.
+    The cert_file generate by 'openssl pkcs12 -in Certificates.p12 -out MyApplication.pem -nodes -clcerts'.
 
     """
 
@@ -67,8 +68,7 @@ def push_notification_message(notification_type=None):
 
     # prepare certification file
     push_file_path = path.abspath(path.dirname(__file__))
-    the_certfile = path.join(push_file_path[:-6], 'MyApplicationTest.pem')
-    #the_certfile = path.join(push_file_path[:-6], 'MobileSWDCardProductionPush.pem')
+    the_certfile = path.join(push_file_path, 'config/' + current_app.config['CERT_FILE_NAME'])
 
     #device_token = 'C009AEB794E40D6320B019444EC7C8E0B271D9C1950BA887B442757C746B8EC5'
 
@@ -104,7 +104,7 @@ def push_notification_message(notification_type=None):
 def _create_notification_data(notification_type, message, device_tokens):
     """
 
-        simple notification format: refer Local and Push Notification Programming Guide
+        notification format: refer Local and Push Notification Programming Guide
         payload need encode 'utf-8'
 
     """
