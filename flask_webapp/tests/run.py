@@ -2,8 +2,8 @@ import sys
 from os import path
 import unittest
 
-testroot = path.abspath(path.dirname(__file__) or '.')
-sys.path.insert(0, testroot[:-5])
+test_root = path.abspath(path.dirname(__file__) or '.')
+sys.path.insert(0, test_root[:-5])
 
 try:
     import flask

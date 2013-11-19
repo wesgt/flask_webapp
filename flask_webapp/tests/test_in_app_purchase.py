@@ -19,10 +19,12 @@ class IAPTestCase(unittest.TestCase):
 
         drop_all_table()
 
-    def setUpClass():
+    @classmethod
+    def setUpClass(cls):
         pass
 
-    def tearDownClass():
+    @classmethod
+    def tearDownClass(cls):
         pass
 
     def test_iap_receipts_verify_return_correct(self):
@@ -33,7 +35,7 @@ class IAPTestCase(unittest.TestCase):
             follow_redirects=False)
 
         verify_result = json.loads(str(verify_rv.data, 'utf-8'))
-        self.assertEqual(ResultType.VERIFY_SECCESS, verify_result['result'])
+        self.assertEqual(ResultType.VERIFY_SUCCESS, verify_result['result'])
 
     def test_iap_receipts_verify_return_error(self):
         verify_rv = self.client.post(

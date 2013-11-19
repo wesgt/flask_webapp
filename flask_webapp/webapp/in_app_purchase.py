@@ -6,7 +6,7 @@ iap = Blueprint('iap', __name__, template_folder='templates')
 
 
 class ResultType:
-    VERIFY_SECCESS = 'verify_success'
+    VERIFY_SUCCESS = 'verify_success'
     VERIFY_FAIL = 'verify_fail'
 
 
@@ -38,7 +38,7 @@ def iap_receipts_verify():
         return jsonify(result=ResultType.VERIFY_FAIL)
 
     if verify_result['status'] == 0:
-        return jsonify(result=ResultType.VERIFY_SECCESS)
+        return jsonify(result=ResultType.VERIFY_SUCCESS)
     else:
         return jsonify(result=ResultType.VERIFY_FAIL)
 

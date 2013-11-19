@@ -19,10 +19,12 @@ class PushNotificationTestCase(unittest.TestCase):
 
         drop_all_table()
 
-    def setUpClass():
+    @classmethod
+    def setUpClass(cls):
         pass
 
-    def tearDownClass():
+    @classmethod
+    def tearDownClass(cls):
         pass
 
     # register devices token
@@ -35,7 +37,7 @@ class PushNotificationTestCase(unittest.TestCase):
             follow_redirects=False)
 
         register_result = json.loads(str(register_rv.data, 'utf-8'))
-        self.assertEqual(ResultType.REGISTER_DIVICES_TOKEN_SUCCESS,
+        self.assertEqual(ResultType.REGISTER_DEVICES_TOKEN_SUCCESS,
                          register_result['result'])
 
     def test_register_devices_token_return_empty_token_error(self):
@@ -47,14 +49,28 @@ class PushNotificationTestCase(unittest.TestCase):
             follow_redirects=False)
 
         register_result = json.loads(str(register_rv.data, 'utf-8'))
-        self.assertEqual(ResultType.REGISTER_DIVICES_EMPTY_TOKEN_ERROR,
+        self.assertEqual(ResultType.REGISTER_DEVICES_EMPTY_TOKEN_ERROR,
                          register_result['result'])
 
     def test_simple_notification_return_correct(self):
         message = 'Oh no! Server\'s Down!'
 
         push_notification_rv = self.client.post(
-            '/notify/message',
+            '/notify/message/simple',
+            data=dict(message=message),
+            follow_redirects=False)
+
+        push_notification_result = json.loads(str(push_notification_rv.data,
+                                              'utf-8'))
+
+        self.assertEqual(ResultType.PUSH_NOTIFICATION_SUCCESS,
+                         push_notification_result['result'])
+
+    def test_enhanced_notification_return_correct(self):
+        message = 'Oh no! Server\'s Down!'
+
+        push_notification_rv = self.client.post(
+            '/notify/message/enhanced',
             data=dict(message=message),
             follow_redirects=False)
 
