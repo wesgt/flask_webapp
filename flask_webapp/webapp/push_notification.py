@@ -70,12 +70,7 @@ def push_notification_message(notification_type=None):
     push_file_path = path.abspath(path.dirname(__file__))
     the_certfile = path.join(push_file_path, 'config/' + current_app.config['CERT_FILE_NAME'])
 
-    #device_token = 'C009AEB794E40D6320B019444EC7C8E0B271D9C1950BA887B442757C746B8EC5'
-
-    device_tokens = ['03DC5621458E1F300483DE51BD89A8F4A266A7D966C403085372F7668CF24E21',
-                     '03DC5621458E1F300483DE51BD89A8F4A266A7D966C403085372F7668CF24E21',
-                     '03DC5621458E1F300483DE51BD89A8F4A266A7D966C403085372F7668CF24E21']
-    #device_tokens = ['03DC5621458E1F300483DE51BD89A8F4A266A7D966C403085372F7668CF20000']
+    device_tokens = ['C009AEB794E40D6320B019444EC7C8E0B271D9C1950BA887B442757C746B8EC5']
     notification_data = _create_notification_data(notification_type, request.form['message'],
                                                   device_tokens)
 

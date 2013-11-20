@@ -9,7 +9,7 @@ class DeviceToken(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(String(50))
     game_id = Column(String(50))
-    token = Column(String(50))
+    token = Column(String(64))
     register_date = Column(DateTime)
 
     def __init__(self, user_id, game_id, token,
