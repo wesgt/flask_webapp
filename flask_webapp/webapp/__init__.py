@@ -3,7 +3,7 @@ import datetime
 import logging
 from logging import FileHandler, Formatter
 from flask import Flask
-from webapp.database import init_db, create_all_table, create_all_test_table
+from webapp.database import db_session, init_db, create_all_table, create_all_test_table
 
 
 def create_app(config_filename):
@@ -42,3 +42,7 @@ def create_log_file_handler(log_path):
     ))
 
     return file_handler
+
+@app.teardown_request
+def shutdown_session(exception=None):
+    db_session.remove()

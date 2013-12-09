@@ -3,3 +3,4 @@
 Flask_Webapp.egg-info/*
 build/*
 dist/*
+.idea/*
