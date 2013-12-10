@@ -10,6 +10,7 @@ def create_app(config_filename):
     app = Flask(__name__)
     app.config.from_pyfile(config_filename, silent=True)
 
+    # TODO logger 配置路徑有問題
     # app.logger.addHandler(create_log_file_handler(app.config.get('LOG_PATH')))
     init_db(app.config['SQLALCHEMY_DATABASE_URI'])
 
@@ -43,6 +44,20 @@ def create_log_file_handler(log_path):
 
     return file_handler
 
+app = create_app('config_production.cfg')
+
+
 @app.teardown_request
 def shutdown_session(exception=None):
-    db_session.remove()
+    if db_session:
+        db_session.remove()
+
+@app.route('/mobile/')
+def index():
+    return 'mobile'
+
+from webapp.in_app_purchase import iap
+app.register_blueprint(iap, url_prefix='/mobile')
+
+from webapp.push_notification import notify
+app.register_blueprint(notify, url_prefix='/mobile')

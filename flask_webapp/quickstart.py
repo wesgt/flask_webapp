@@ -111,7 +111,6 @@ def generate(d, overwrite=True, silent=False):
 
     copy_file('webapp_main.py')
     copy_file('webapp/__init__.py')
-    copy_file('webapp/extensions.py')
     copy_file('webapp/database.py')
     copy_file('webapp/models.py')
     copy_file('webapp/config_production.cfg')
@@ -123,21 +122,11 @@ def generate(d, overwrite=True, silent=False):
     # add iap module
     if d['open_iap']:
         copy_file('webapp/in_app_purchase.py')
-
-        iap_blueprint_contant = 'from webapp.in_app_purchase import iap\n' + \
-                                "app.register_blueprint(iap, url_prefix='/iap')\n"
-        write_file(path.join(webapp_root_path, 'webapp/extensions.py'), iap_blueprint_contant)
-
         copy_file('tests/test_in_app_purchase.py')
 
     # add push notification module
     if d['open_push_notification']:
         copy_file('webapp/push_notification.py')
-
-        push_blueprint_contant = 'from webapp.push_notification import push_notification\n' + \
-                    "app.register_blueprint(push_notification, url_prefix='/push_notification')\n"
-        write_file(path.join(webapp_root_path, 'webapp/extensions.py'), push_blueprint_contant)
-
         copy_file('tests/test_push_notification.py')
 
     print()

@@ -14,10 +14,10 @@ if sys.version_info < (3, 3):
     sys.exit(1)
 
 setup(
-    name="Flask_Webapp",
+    name="Flask_Mobile",
     version="0.1",
     packages=find_packages(),
-    package_data = {
+    package_data={
         'flask_webapp.webapp': ['*.cfg'],
     },
     entry_points={
