@@ -1,6 +1,6 @@
 *.log
 *.pyc
-Flask_Webapp.egg-info/*
+Flask_Mobile.egg-info/*
 build/*
 dist/*
 .idea/*
