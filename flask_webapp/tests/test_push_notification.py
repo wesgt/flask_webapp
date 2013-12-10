@@ -2,7 +2,6 @@ import unittest
 from flask import json
 import webapp
 from webapp.push_notification import notify, ResultType
-from webapp.database import db_session, drop_all_table
 
 
 class PushNotificationTestCase(unittest.TestCase):
@@ -10,10 +9,11 @@ class PushNotificationTestCase(unittest.TestCase):
     def setUp(self):
         app = webapp.create_app('config_testing.cfg')
         app.config['TESTING'] = True
-        app.register_blueprint(notify, url_prefix='/notify')
+        app.register_blueprint(notify, url_prefix='/mobile/notify')
         self.client = app.test_client()
 
     def tearDown(self):
+        from webapp.database import db_session, drop_all_table
         if db_session:
             db_session.remove()
 
@@ -33,7 +33,7 @@ class PushNotificationTestCase(unittest.TestCase):
         token = 'test_token'
         game_id = 'test_game'
         register_rv = self.client.put(
-            '/notify/users/' + user_id + '/devices',
+            '/mobile/notify/users/' + user_id + '/devices',
             data=dict(token=token, game_id=game_id),
             follow_redirects=False)
 
@@ -46,7 +46,7 @@ class PushNotificationTestCase(unittest.TestCase):
         token = ''
         game_id = 'test_game'
         register_rv = self.client.put(
-            '/notify/users/' + user_id + '/devices',
+            '/mobile/notify/users/' + user_id + '/devices',
             data=dict(token=token, game_id=game_id),
             follow_redirects=False)
 
@@ -67,7 +67,7 @@ class PushNotificationTestCase(unittest.TestCase):
         message = 'Oh no! Simple\'s Down!'
 
         push_notification_rv = self.client.post(
-            '/notify/message/simple',
+            '/mobile/notify/message/simple',
             data=dict(message=message),
             follow_redirects=False)
 
@@ -90,7 +90,7 @@ class PushNotificationTestCase(unittest.TestCase):
         message = 'Oh no! Enhanced\'s Down!'
 
         push_notification_rv = self.client.post(
-            '/notify/message/enhanced',
+            '/mobile/notify/message/enhanced',
             data=dict(message=message),
             follow_redirects=False)
 

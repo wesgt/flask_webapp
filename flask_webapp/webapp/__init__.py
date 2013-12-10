@@ -57,7 +57,7 @@ def index():
     return 'mobile'
 
 from webapp.in_app_purchase import iap
-app.register_blueprint(iap, url_prefix='/mobile')
+app.register_blueprint(iap, url_prefix='/mobile/iap')
 
 from webapp.push_notification import notify
-app.register_blueprint(notify, url_prefix='/mobile')
+app.register_blueprint(notify, url_prefix='/mobile/notify')

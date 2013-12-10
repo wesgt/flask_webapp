@@ -14,6 +14,8 @@ class ResultType:
 def iap_receipts_verify():
     """ Validating Receipts With the App Store """
 
+    from webapp.models import IAPVerifyData
+
     SAND_BOX_VERIFY_URL = "https://sandbox.itunes.apple.com/verifyReceipt"
     PRODUCTION_VERIFY_URL = "https://buy.itunes.apple.com/verifyReceipt"
 
@@ -33,6 +35,9 @@ def iap_receipts_verify():
         return jsonify(result=ResultType.VERIFY_FAIL)
 
     if verify_result['status'] == 0:
+        iap_verify_data = IAPVerifyData(request.form['user_id'], request.form['receipt_data'])
+        iap_verify_data.save()
+
         return jsonify(result=ResultType.VERIFY_SUCCESS)
     else:
         return jsonify(result=ResultType.VERIFY_FAIL)
