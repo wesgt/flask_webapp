@@ -7,7 +7,7 @@ from webapp.push_notification import notify, ResultType
 class PushNotificationTestCase(unittest.TestCase):
 
     def setUp(self):
-        app = webapp.create_app('config_testing.cfg')
+        app = webapp.create_app('config/config_testing.cfg')
         app.config['TESTING'] = True
         app.register_blueprint(notify, url_prefix='/mobile/notify')
         self.client = app.test_client()

@@ -44,7 +44,7 @@ def create_log_file_handler(log_path):
 
     return file_handler
 
-app = create_app('config_production.cfg')
+app = create_app('config/config_production.cfg')
 
 
 @app.teardown_request

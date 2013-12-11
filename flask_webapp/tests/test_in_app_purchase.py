@@ -7,7 +7,7 @@ from webapp.in_app_purchase import ResultType, iap
 class IAPTestCase(unittest.TestCase):
 
     def setUp(self):
-        app = webapp.create_app('config_testing.cfg')
+        app = webapp.create_app('config/config_testing.cfg')
         app.config['TESTING'] = True
         app.register_blueprint(iap, url_prefix='/mobile/iap')
         self.client = app.test_client()
