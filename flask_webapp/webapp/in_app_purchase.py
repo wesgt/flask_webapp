@@ -35,8 +35,18 @@ def iap_receipts_verify():
         return jsonify(result=ResultType.VERIFY_FAIL)
 
     if verify_result['status'] == 0:
-        iap_verify_data = IAPVerifyData(request.form['user_id'], request.form['receipt_data'])
-        iap_verify_data.save()
+        iap_verify_data = IAPVerifyData.query.filter(IAPVerifyData.transaction_id ==
+                                                     verify_result['receipt']['original_transaction_id']).first()
+
+        if iap_verify_data:
+            iap_verify_data.transaction_id = verify_result['receipt']['transaction_id']
+            iap_verify_data.purchase_date = verify_result['receipt']['purchase_date']
+            iap_verify_data.receipt_data = request.form['receipt_data']
+            iap_verify_data.save()
+
+        else:
+            iap_verify_data = IAPVerifyData(request.form['user_id'], verify_result['receipt'], request.form['receipt_data'])
+            iap_verify_data.save()
 
         return jsonify(result=ResultType.VERIFY_SUCCESS)
     else:
