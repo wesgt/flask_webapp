@@ -38,33 +38,47 @@ class IAPVerifyData(Base):
     user_id = Column(String(50))
     bid = Column(String(50))
     bvrs = Column(String(50))
-    item_id = Column(String(50))
     transaction_id = Column(String(50), unique=True)
     product_id = Column(String(50))
     purchase_date = Column(String(50))
     quantity = Column(String(20))
-    unique_identifier = Column(String(255))
-    unique_vendor_identifier = Column(String(255))
-    receipt_data = Column(UnicodeText())
+    #receipt_data = Column(UnicodeText())
     verify_date = Column(DateTime)
 
-    def __init__(self, user_id, verify_data, receipt_data,
-                 verify_date=datetime.datetime.today()):
-        self.user_id = user_id
-        self.bid = verify_data.get('bid')
-        self.bvrs = verify_data.get('bvrs')
-        self.item_id = verify_data.get('item_id')
-        self.transaction_id = verify_data.get('transaction_id')
-        self.product_id = verify_data.get('product_id')
-        self.purchase_date = verify_data.get('purchase_date')
-        self.quantity = verify_data.get('quantity')
-        self.unique_identifier = verify_data.get('unique_identifier')
-        self.unique_vendor_identifier = verify_data.get('unique_vendor_identifier')
-        self.receipt_data = receipt_data
-        self.verify_date = verify_date
+    def __init__(self):
+        pass
 
     def __repr__(self):
         return '<IAPVerifyData user_id {0}>'.format(self.user_id)
+
+    @staticmethod
+    def create_for_ios6(user_id, verify_data,
+                        verify_date=datetime.datetime.today()):
+        iap_verify_data = IAPVerifyData()
+        iap_verify_data.user_id = user_id
+        iap_verify_data.bid = verify_data.get('bid')
+        iap_verify_data.bvrs = verify_data.get('bvrs')
+        iap_verify_data.transaction_id = verify_data.get('transaction_id')
+        iap_verify_data.product_id = verify_data.get('product_id')
+        iap_verify_data.purchase_date = verify_data.get('purchase_date')
+        iap_verify_data.quantity = verify_data.get('quantity')
+        iap_verify_data.verify_date = verify_date
+
+        return iap_verify_data
+
+    @staticmethod
+    def create_for_ios7(user_id, bundle_id, application_version, in_app_data):
+        iap_verify_data = IAPVerifyData()
+        iap_verify_data.user_id = user_id
+        iap_verify_data.bid = bundle_id
+        iap_verify_data.bvrs = application_version
+        iap_verify_data.transaction_id = in_app_data.get('transaction_id')
+        iap_verify_data.product_id = in_app_data.get('product_id')
+        iap_verify_data.purchase_date = in_app_data.get('purchase_date')
+        iap_verify_data.quantity = in_app_data.get('quantity')
+        iap_verify_data.verify_date = datetime.datetime.today()
+
+        return iap_verify_data
 
     def save(self):
         db_session.add(self)
