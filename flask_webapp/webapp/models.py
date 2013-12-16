@@ -35,10 +35,9 @@ class IAPVerifyData(Base):
     __tablename__ = 'iap_verify_data'
     __table_args__ = {'extend_existing':True}
     id = Column(Integer, primary_key=True)
-    user_id = Column(String(50))
     bid = Column(String(50))
-    bvrs = Column(String(50))
     transaction_id = Column(String(50), unique=True)
+    udid = Column(String(50))
     product_id = Column(String(50))
     purchase_date = Column(String(50))
     quantity = Column(String(20))
@@ -52,13 +51,12 @@ class IAPVerifyData(Base):
         return '<IAPVerifyData user_id {0}>'.format(self.user_id)
 
     @staticmethod
-    def create_for_ios6(user_id, verify_data,
+    def create_for_ios6(udid, verify_data,
                         verify_date=datetime.datetime.today()):
         iap_verify_data = IAPVerifyData()
-        iap_verify_data.user_id = user_id
         iap_verify_data.bid = verify_data.get('bid')
-        iap_verify_data.bvrs = verify_data.get('bvrs')
         iap_verify_data.transaction_id = verify_data.get('transaction_id')
+        iap_verify_data.udid = udid
         iap_verify_data.product_id = verify_data.get('product_id')
         iap_verify_data.purchase_date = verify_data.get('purchase_date')
         iap_verify_data.quantity = verify_data.get('quantity')
@@ -67,16 +65,16 @@ class IAPVerifyData(Base):
         return iap_verify_data
 
     @staticmethod
-    def create_for_ios7(user_id, bundle_id, application_version, in_app_data):
+    def create_for_ios7(udid, bundle_id, in_app_data,
+                        verify_date=datetime.datetime.today()):
         iap_verify_data = IAPVerifyData()
-        iap_verify_data.user_id = user_id
         iap_verify_data.bid = bundle_id
-        iap_verify_data.bvrs = application_version
         iap_verify_data.transaction_id = in_app_data.get('transaction_id')
+        iap_verify_data.udid = udid
         iap_verify_data.product_id = in_app_data.get('product_id')
         iap_verify_data.purchase_date = in_app_data.get('purchase_date')
         iap_verify_data.quantity = in_app_data.get('quantity')
-        iap_verify_data.verify_date = datetime.datetime.today()
+        iap_verify_data.verify_date = verify_date
 
         return iap_verify_data
 
