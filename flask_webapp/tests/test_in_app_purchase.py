@@ -1,7 +1,8 @@
 import unittest
-from flask import json
+import datetime, time
 import webapp
-from webapp.in_app_purchase import ResultType, iap
+from webapp.in_app_purchase import ResultType, iap, APP_SECRET_KEY
+from webapp.token import create_token, decode_token
 
 
 class IAPTestCase(unittest.TestCase):
@@ -81,3 +82,37 @@ class IAPTestCase(unittest.TestCase):
 
         verify_result = str(token_verify_rv.data[0:4], 'utf-8')
         self.assertEqual(ResultType.VERIFY_SUCCESS, verify_result)
+
+    def test_iap_token_verify_return_expire_error(self):
+        # first verify receipt data
+        receipt_data = 'eyJzaWduYXR1cmUiID0gIkFrSEkxZkxOV3V2bkV2Z1hoeVRmaHVDQjVnNnFvTWQvVXVUK0VkblA4bi9yL0QrZjZsZnlockhJbjZFVVlnckpJY0h1UUd4TE9TS3lVNURSVHNkazRScnBBTnlhYWY4NmdFK3dQRzFQM01WRU92MzhvMHFSUmhUcHIyc1FZYlFNS0t4QzQzemxzV3dGZzdYdXNlR2xqNHhFY3FnVzhFbjhuR29iVWtLL3NOZTBBQUFEVnpDQ0ExTXdnZ0k3b0FNQ0FRSUNDR1VVa1UzWldBUzFNQTBHQ1NxR1NJYjNEUUVCQlFVQU1IOHhDekFKQmdOVkJBWVRBbFZUTVJNd0VRWURWUVFLREFwQmNIQnNaU0JKYm1NdU1TWXdKQVlEVlFRTERCMUJjSEJzWlNCRFpYSjBhV1pwWTJGMGFXOXVJRUYxZEdodmNtbDBlVEV6TURFR0ExVUVBd3dxUVhCd2JHVWdhVlIxYm1WeklGTjBiM0psSUVObGNuUnBabWxqWVhScGIyNGdRWFYwYUc5eWFYUjVNQjRYRFRBNU1EWXhOVEl5TURVMU5sb1hEVEUwTURZeE5ESXlNRFUxTmxvd1pERWpNQ0VHQTFVRUF3d2FVSFZ5WTJoaGMyVlNaV05sYVhCMFEyVnlkR2xtYVdOaGRHVXhHekFaQmdOVkJBc01Fa0Z3Y0d4bElHbFVkVzVsY3lCVGRHOXlaVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFTE1Ba0dBMVVFQmhNQ1ZWTXdnWjh3RFFZSktvWklodmNOQVFFQkJRQURnWTBBTUlHSkFvR0JBTXJSakYyY3Q0SXJTZGlUQ2hhSTBnOHB3di9jbUhzOHAvUndWL3J0LzkxWEtWaE5sNFhJQmltS2pRUU5mZ0hzRHM2eWp1KytEcktKRTd1S3NwaE1kZEtZZkZFNXJHWHNBZEJFakJ3Ukl4ZXhUZXZ4M0hMRUZHQXQxbW9LeDUwOWRoeHRpSWREZ0p2MllhVnM0OUIwdUp2TmR5NlNNcU5OTEhzREx6RFM5b1pIQWdNQkFBR2pjakJ3TUF3R0ExVWRFd0VCL3dRQ01BQXdId1lEVlIwakJCZ3dGb0FVTmgzbzRwMkMwZ0VZdFRKckR0ZERDNUZZUXpvd0RnWURWUjBQQVFIL0JBUURBZ2VBTUIwR0ExVWREZ1FXQkJTcGc0UHlHVWpGUGhKWENCVE16YU4rbVY4azlUQVFCZ29xaGtpRzkyTmtCZ1VCQkFJRkFEQU5CZ2txaGtpRzl3MEJBUVVGQUFPQ0FRRUFFYVNiUGp0bU40Qy9JQjNRRXBLMzJSeGFjQ0RYZFZYQWVWUmVTNUZhWnhjK3Q4OHBRUDkzQmlBeHZkVy8zZVRTTUdZNUZiZUFZTDNldHFQNWdtOHdyRm9qWDBpa3lWUlN0USsvQVEwS0VqdHFCMDdrTHM5UVVlOGN6UjhVR2ZkTTFFdW1WL1VndkRkNE53Tll4TFFNZzRXVFFmZ2tRUVZ5OEdYWndWSGdiRS9VQzZZNzA1M3BHWEJrNTFOUE0zd294aGQzZ1NSTHZYaitsb0hzU3RjVEVxZTlwQkRwbUc1K3NrNHR3K0dLM0dNZUVONS8rZTFRVDlucC9LbDFuaithQnc3QzB4c3kwYkZuYUFkMWNTUzZ4ZG9yeS9DVXZNNmd0S3Ntbk9PZHFUZXNicDBiczhzbjZXcXMwQzlkZ2N4Ukh1T01aMnRtOG5wTFVtN2FyZ09TelE9PSI7InB1cmNoYXNlLWluZm8iID0gImV3b0pJbTl5YVdkcGJtRnNMWEIxY21Ob1lYTmxMV1JoZEdVdGNITjBJaUE5SUNJeU1ERXpMVEExTFRBNUlESXdPak0xT2pBeElFRnRaWEpwWTJFdlRHOXpYMEZ1WjJWc1pYTWlPd29KSW5WdWFYRjFaUzFwWkdWdWRHbG1hV1Z5SWlBOUlDSmtNV1ZoWmpRNFpEVmxOakJqTmpreFlUZzJZVE14TURoallXWTNPVEF4TjJZME16bGtZV1kxSWpzS0NTSnZjbWxuYVc1aGJDMTBjbUZ1YzJGamRHbHZiaTFwWkNJZ1BTQWlNVEF3TURBd01EQTNNelUzTWpZNU5TSTdDZ2tpWW5aeWN5SWdQU0FpTVM0d0lqc0tDU0owY21GdWMyRmpkR2x2YmkxcFpDSWdQU0FpTVRBd01EQXdNREEzTXpVM01qWTVOU0k3Q2draWNYVmhiblJwZEhraUlEMGdJakVpT3dvSkltOXlhV2RwYm1Gc0xYQjFjbU5vWVhObExXUmhkR1V0YlhNaUlEMGdJakV6TmpneE5UWTVNREV5TlRraU93b0pJblZ1YVhGMVpTMTJaVzVrYjNJdGFXUmxiblJwWm1sbGNpSWdQU0FpT1RFNE5EY3pNakV0UlVRME1TMDBNMEZCTFRrd1FUUXRPVVUxTjBVMlJFWXdSa0k0SWpzS0NTSndjbTlrZFdOMExXbGtJaUE5SUNKVGQyOXlaREF3TVNJN0Nna2lhWFJsYlMxcFpDSWdQU0FpTmpRek5URXpNamt5SWpzS0NTSmlhV1FpSUQwZ0ltTnZiUzV6YjJaMGMzUmhjaTUwWlhOMFUzZGtabWxuYUhRaU93b0pJbkIxY21Ob1lYTmxMV1JoZEdVdGJYTWlJRDBnSWpFek5qZ3hOVFk1TURFeU5Ua2lPd29KSW5CMWNtTm9ZWE5sTFdSaGRHVWlJRDBnSWpJd01UTXRNRFV0TVRBZ01ETTZNelU2TURFZ1JYUmpMMGROVkNJN0Nna2ljSFZ5WTJoaGMyVXRaR0YwWlMxd2MzUWlJRDBnSWpJd01UTXRNRFV0TURrZ01qQTZNelU2TURFZ1FXMWxjbWxqWVM5TWIzTmZRVzVuWld4bGN5STdDZ2tpYjNKcFoybHVZV3d0Y0hWeVkyaGhjMlV0WkdGMFpTSWdQU0FpTWpBeE15MHdOUzB4TUNBd016b3pOVG93TVNCRmRHTXZSMDFVSWpzS2ZRPT0iOyJlbnZpcm9ubWVudCIgPSAiU2FuZGJveCI7InBvZCIgPSAiMTAwIjsic2lnbmluZy1zdGF0dXMiID0gIjAiO30='
+        verify_rv = self.client.post(
+            '/mobile/iap/receipts/verify',
+            data=dict(udid='1234', receipt_data=receipt_data),
+            follow_redirects=False)
+
+        client_token = decode_token(verify_rv.data[4:])
+
+        before_time = time.time() - (60 * 60 * 24 * 6)
+        before_date = datetime.datetime.fromtimestamp(before_time)
+
+        token_data = create_token(ResultType.VERIFY_SUCCESS, APP_SECRET_KEY,
+                                  client_token.udid, before_date,
+                                  client_token.transaction_id)
+        token_data = token_data[4:]
+        token_verify_rv = self.client.post(
+            '/mobile/iap/token/verify',
+            data=token_data, follow_redirects=False)
+
+        verify_result = str(token_verify_rv.data[0:4], 'utf-8')
+        self.assertEqual(ResultType.TOKEN_EXPIRE_ERROR, verify_result)
+
+    def test_iap_token_verify_return_no_exist_error(self):
+        token_data = b'\xa8qk\x1f3\x1ff99\x88\xe4\xc9{\xcb#Yi\x8b\xa90\x00\x041234201312171410321000000073572695'
+
+        token_verify_rv = self.client.post(
+            '/mobile/iap/token/verify',
+            data=token_data, follow_redirects=False)
+
+        verify_result = str(token_verify_rv.data[0:4], 'utf-8')
+        self.assertEqual(ResultType.TOKEN_NO_EXIST_ERROR, verify_result)

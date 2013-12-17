@@ -1,6 +1,7 @@
 import urllib
 import base64
 from flask import request, Blueprint, current_app, json, jsonify
+from webapp.token import create_token, generate_hash_code, decode_token
 
 
 iap = Blueprint('iap', __name__, template_folder='templates')
@@ -13,6 +14,9 @@ APP_SECRET_KEY = '123456789'
 class ResultType:
     VERIFY_SUCCESS = 'succ'
     VERIFY_FAIL = 'fail'
+    TOKEN_INVALID_ERROR = 'inva'
+    TOKEN_EXPIRE_ERROR = 'expi'
+    TOKEN_NO_EXIST_ERROR = 'noex'
 
 
 @iap.route('/receipts/verify', methods=['POST', 'GET'])
@@ -42,9 +46,12 @@ def iap_receipts_verify():
         return jsonify(result=ResultType.VERIFY_FAIL)
 
     if verify_result['status'] == 0:
-        iap_verify_data = _backup_verify_data(verify_result)
+        iap_verify_data = _backup_verify_data(verify_result, udid)
 
-        return _create_token(APP_SECRET_KEY, udid, iap_verify_data.verify_date, iap_verify_data.transaction_id)
+        return create_token(ResultType.VERIFY_SUCCESS, APP_SECRET_KEY,
+                            udid, iap_verify_data.verify_date,
+                            iap_verify_data.transaction_id)
+
     else:
         return str.encode(ResultType.VERIFY_FAIL)
 
@@ -57,7 +64,7 @@ def _is_ios6(receipt_data):
         return False
 
 
-def _backup_verify_data(verify_result):
+def _backup_verify_data(verify_result, udid):
     """backup verify data to database
 
     Find verify data from database by 'original_transaction_id'.
@@ -79,7 +86,7 @@ def _backup_verify_data(verify_result):
             iap_verify_data.save()
 
         else:
-            iap_verify_data = IAPVerifyData.create_for_ios6('ooo', verify_result['receipt'])
+            iap_verify_data = IAPVerifyData.create_for_ios6(udid, verify_result['receipt'])
             iap_verify_data.save()
     else:
         in_app_result = verify_result['receipt']['in_app'][0]
@@ -92,50 +99,49 @@ def _backup_verify_data(verify_result):
             iap_verify_data.save()
 
         else:
-            iap_verify_data = IAPVerifyData.create_for_ios7('ooo',
+            iap_verify_data = IAPVerifyData.create_for_ios7(udid,
                                                             verify_result['receipt']['bundle_id'],
-                                                            verify_result['receipt']['application_version'],
                                                             in_app_result)
             iap_verify_data.save()
 
     return iap_verify_data
 
 
-def _create_token(app_secret_key, udid, verify_date, transaction_id):
-    """ create sha1 token
-
-    return data length format : result:4 +
-                                token:20 +
-                                udid_len:2 +
-                                udid:udid_len +
-                                verify_time:14 +
-                                transaction_id_len:2
-                                transaction_id:transaction_id_len
-
-    """
-
-    import hashlib
-    import struct
-
-    verify_time = verify_date.strftime("%Y%m%d%H%M%S")
-    check_origin_data = app_secret_key + udid + verify_time + transaction_id
-    check_hash_code = hashlib.sha1(str.encode(check_origin_data))
-
-    token_format = '!4s20sH{0}s14s{1}s'.format(len(udid), len(transaction_id))
-    final_data = struct.pack(token_format, str.encode(ResultType.VERIFY_SUCCESS), check_hash_code.digest(),
-                             len(udid), str.encode(udid), str.encode(verify_time), str.encode(transaction_id))
-
-    return final_data
-
-
 @iap.route('/token/verify', methods=['POST', 'GET'])
 def iap_token_verify():
     """ iap token verify """
 
-    check_hash_code = request.data[0:20]
-    udid_len = int.from_bytes(request.data[20:22], byteorder="big")
-    udid = str(request.data[22:(22 + udid_len)], 'utf-8')
-    verify_time = str(request.data[(22 + udid_len):(22 + udid_len + 14)], 'utf-8')
-    transaction_id = str(request.data[(22 + udid_len + 14):], 'utf-8')
+    from datetime import datetime
+    from webapp.models import IAPVerifyData
 
+    client_token = decode_token(request.data)
+
+    iap_verify_data = IAPVerifyData.query.filter(
+        IAPVerifyData.transaction_id == client_token.transaction_id,
+        IAPVerifyData.udid == client_token.udid
+    ).first()
+
+    if iap_verify_data is None:
+        return str.encode(ResultType.TOKEN_NO_EXIST_ERROR)
+
+    # check time valid
+    if client_token.verify_time != iap_verify_data.verify_date.strftime("%Y%m%d%H%M%S"):
+        return str.encode(ResultType.TOKEN_EXPIRE_ERROR)
+
+    client_verify_date = datetime.strptime(client_token.verify_time, "%Y%m%d%H%M%S")
+
+    remain_time = int((datetime.now() - client_verify_date).total_seconds())
+
+    if remain_time > (60 * 60 * 24 * 5):
+        str.encode(ResultType.TOKEN_EXPIRE_ERROR)
+
+    # check hash code
+    check_hash_code = generate_hash_code(APP_SECRET_KEY, iap_verify_data.udid,
+                                         iap_verify_data.verify_date,
+                                         iap_verify_data.transaction_id)
+
+    if client_token.check_hash_code != check_hash_code.digest():
+        return str.encode(ResultType.TOKEN_INVALID_ERROR)
+
+    print('token verify : {0}'.format(ResultType.VERIFY_SUCCESS))
     return str.encode(ResultType.VERIFY_SUCCESS)
